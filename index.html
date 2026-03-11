@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Meine Konfliktmanagementstile (ROCI-II-D)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; max-width: 900px; }
+.question { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc; }
+label { display: block; margin-bottom: 6px; } /* vertikale Anordnung */
+button { margin-top: 5px; padding: 10px 15px; font-size: 1rem; background-color: #ffa500; color: white; border-radius: 9px }
+canvas { margin-top: 15px; }
+.question strong {
+  display: block;
+  margin-bottom: 12px; /* Abstand zwischen Aussage und Radio-Buttons */
+}
+.intro-title {
+  font-size: 1.5rem;   /* größere Schrift */
+  font-weight: bold;   /* fett */
+  display: block;      /* eigene Zeile */
+  margin-bottom: 0.5rem;
+}
+.intro { background: #DEEBF7; padding: 15px; margin-bottom: 20px; }
+table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+th, td { border: 1px solid #ccc; padding: 8px; }
+.footerText {
+  background-color: #fde70e;
+  border: 5px solid #fde70e;
+  padding: 7px;
+  margin-top: 20px;
+  font-size: 0.85rem;
+  border-radius: 5px;
+}
+</style>
+</head>
+<body>
+<div id="introBox" class="intro">
+<span class="intro-title">Meine Konfliktmanagementstile</span><br>
+Bei den folgenden Fragen geht es darum, wie Sie sich in Konfliktsituationen verhalten. Möglicherweise haben Sie gelegentlich Unstimmigkeiten, Meinungsverschiedenheiten oder Differenzen (Konflikte) mit Arbeitskolleginnen und Arbeitskollegen. <br><br>
+Nachfolgend finden Sie eine Reihe von Aussagen. Bitte markieren Sie auf der dazugehörigen Skala jeweils, wie Sie Konflikte mit Ihren Arbeitskolleginnen und Arbeitskollegen handhaben.<br><br>
+Versuchen Sie sich bei der Beurteilung dieser Aussagen an möglichst viele Konfliktsituationen während der letzten Zeit zu erinnern.<br><br>
+Sie können die Ergebnisse sehen, wenn Sie nach Beurteilung der letzten Frage den Button "Auswerten" drücken.
+</div>
+<form id="testForm"></form>
+<canvas id="chart" width="400" height="200"></canvas>
+<div id="interpretation"></div>
+<div id="konfliktstile-info"></div>
+<script>
+const fragen = [
+"Ich versuche, einem Problem gemeinsam mit meinen Arbeitskolleginnen und -kollegen auf den Grund zu gehen, um eine für alle akzeptable Lösung zu finden.",
+"Ich versuche im Allgemeinen, den Bedürfnissen meiner Arbeitskolleginnen und -kollegen gerecht zu werden.",
+"Ich versuche, mich nach Möglichkeit nicht festlegen zu lassen und bemühe mich, meine Konflikte für mich zu behalten.",
+"Ich versuche, meine Ideen mit denen meiner Arbeitskolleginnen und -kollegen abzustimmen, um so gemeinsam zu einer Entscheidung zu gelangen.",
+"Ich bemühe mich, mit meinen Arbeitskolleginnen und -kollegen die Lösung für ein Problem zu finden, die unsere Erwartungen erfüllt.",
+"Ich vermeide gewöhnlich offene Diskussionen über Differenzen mit meinen Arbeitskolleginnen und -kollegen.",
+"Ich versuche, einen Mittelweg zu finden, um aus einer Sackgasse rauszukommen.",
+"Ich nutze meinen Einfluss, um meine Ideen durchzusetzen.",
+"Ich nutze meine Autorität, um eine Entscheidung zu meinen Gunsten herbeizuführen.",
+"Ich komme den Wünschen meiner Arbeitskolleginnen und -kollegen normalerweise entgegen.",
+"Ich gebe den Wünschen meiner Arbeitskolleginnen und -kollegen nach.",
+"Ich tausche mit meinen Arbeitskolleginnen und -kollegen genaue Informationen aus, um ein Problem gemeinsam zu lösen.",
+"Ich mache meinen Arbeitskolleginnen und -kollegen gegenüber im Allgemeinen Zugeständnisse.",
+"Ich schlage im Allgemeinen einen Mittelweg vor, um aus festgefahrenen Situationen herauszukommen.",
+"Ich verhandle mit meinen Arbeitskolleginnen und -kollegen, um zu einem Kompromiss zu kommen.",
+"Ich versuche, Meinungsverschiedenheiten mit meinen Arbeitskolleginnen und -kollegen aus dem Weg zu gehen.",
+"Ich vermeide Konfrontationen mit meinen Arbeitskolleginnen und -kollegen.",
+"Ich nutze meine Sachkenntnis, um eine Entscheidung zu meinen Gunsten herbeizuführen.",
+"Ich schliesse mich den Vorschlägen meiner Arbeitskolleginnen und -kollegen oft an.",
+"Ich verfahre nach dem Prinzip 'geben und nehmen', so dass ein Kompromiss gefunden werden kann.",
+"Ich verfolge meine Interessen im Allgemeinen energisch.",
+"Ich versuche, all unsere Anliegen offenzulegen, so dass die Probleme auf die bestmögliche Art gelöst werden können.",
+"Ich arbeite mit meinen Arbeitskolleginnen und -kollegen zusammen, um zu Entscheidungen zu kommen, die für uns akzeptabel sind.",
+"Ich versuche, die Erwartungen meiner Arbeitskolleginnen und -kollegen zu erfüllen.",
+"Ich nutze manchmal meinen Einfluss, um eine Wettbewerbssituation für mich zu entscheiden.",
+"Ich versuche, meine abweichende Meinung gegenüber Arbeitskolleginnen und -kollegen für mich zu behalten, um kein böses Blut zu schaffen.",
+"Ich versuche, unerfreuliche Wortwechsel mit meinen Arbeitskolleginnen und -kollegen zu vermeiden.",
+"Ich versuche, mit meinen Arbeitskolleginnen und -kollegen zu einem einvernehmlichen Verständnis eines Problems zu gelangen."
+];
+const labels = [
+"stimme überhaupt nicht zu",
+"stimme nicht zu",
+"bin unschlüssig",
+"stimme zu",
+"stimme voll und ganz zu"
+];
+let currentIndex = 0;
+let answers = {};
+const form = document.getElementById('testForm');
+const introBox = document.getElementById('introBox');
+function showQuestion(index) {
+  form.innerHTML = '';
+  // Ab zweiter Frage Intro-Box verkürzen
+  if (index > 0) {
+    introBox.innerHTML = `<span class="intro-title">Meine Konfliktmanagementstile</span>`;
+  }
+  const div = document.createElement('div');
+  div.className = 'question';
+  div.innerHTML = `<strong>${index+1}. ${fragen[index]}</strong>` +
+    [1,2,3,4,5].map(val =>
+      `<label><input type="radio" name="q${index+1}" value="${val}" ${answers[index+1]==val?'checked':''}> ${labels[val-1]}</label>`
+    ).join('');
+  form.appendChild(div);
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = index < fragen.length - 1 ? "Weiter" : "Auswerten";
+  btn.onclick = () => {
+    const selected = document.querySelector(`input[name="q${index+1}"]:checked`);
+    if (!selected) {
+      alert(`Bitte beantworten Sie Frage ${index+1}, bevor Sie fortfahren.`);
+      return;
+    }
+    answers[index+1] = parseInt(selected.value);
+    if (index < fragen.length - 1) {
+      currentIndex++;
+      showQuestion(currentIndex);
+    } else {
+      auswerten();
+    }
+  };
+  form.appendChild(btn);
+  const footer = document.createElement("div");
+  footer.className = "footerText";
+  footer.innerHTML = `🎓 Quelle Konfliktmanagementstile Bilsky & Wülker, 2000;
+  App-Version Prof. Dr. Albert Vollmer, Hochschule für Angewandte Psychologie FHNW, 2026.<br>
+  ❗️Datenschutzhinweis: Die eingegebenen Daten werden nirgends gespeichert
+  und erlöschen beim Schliessen der App.<br>`;
+  form.appendChild(footer);
+}
+showQuestion(currentIndex);
+function auswerten() {
+    let data = [];
+    for (let i = 1; i <= fragen.length; i++) {
+        data[i] = answers[i];
+    }
+
+    function mittelwert(items) {
+        return items.reduce((sum, i) => sum + data[i], 0) / items.length;
+    }
+
+    const integrieren = mittelwert([1, 4, 5, 12, 22, 23, 28]);
+    const nachgeben = mittelwert([2, 10, 11, 13, 19, 24]);
+    const vermeiden = mittelwert([3, 6, 16, 17, 26, 27]);
+    const durchsetzen = mittelwert([8, 9, 18, 21, 25]);
+    const kompromiss = mittelwert([7, 14, 15, 20]);
+
+    const mittelwerte = { Integrieren: integrieren, Nachgeben: nachgeben, Vermeiden: vermeiden, Durchsetzen: durchsetzen, Kompromiss: kompromiss };
+    const erklaerung = {
+    Integrieren: {
+        hoch: "Sie setzen in hohem Masse auf eine kooperative und gemeinschaftliche Konfliktbearbeitung. Sie suchen aktiv den Dialog, analysieren Probleme mit anderen und streben nach Lösungen, die die Interessen aller Beteiligten berücksichtigen. Dies fördert nachhaltige und vertrauensvolle Beziehungen.",
+        mittel: "Sie nutzen Integrieren situativ – vor allem dann, wenn Ihnen eine stabile Beziehung oder ein qualitativ hochwertiges Ergebnis wichtig ist. Sie sind bereit, Zeit und Energie zu investieren, wenn es der Situation dienlich ist.",
+        niedrig: "Sie setzen selten auf direkte Kooperation. Stattdessen bevorzugen Sie schnellere oder individuellere Lösungswege, was in manchen Fällen zu weniger tragfähigen Vereinbarungen führen kann."
+    },
+    Nachgeben: {
+        hoch: "Sie sind schnell bereit, sich den Bedürfnissen und Wünschen anderer anzupassen, selbst wenn dies Ihre eigenen Ziele einschränkt. Diese Haltung kann Harmonie fördern, birgt jedoch das Risiko, eigene Interessen langfristig zu vernachlässigen.",
+        mittel: "Sie sind bereit, anderen entgegenzukommen, wenn es Situationen entspannt oder Beziehungen stärkt. Gleichzeitig achten Sie auf einen gewissen Ausgleich zu Ihren eigenen Zielen.",
+        niedrig: "Sie stellen Ihre eigenen Interessen klar in den Vordergrund und sind selten bereit, auf Forderungen oder Wünsche anderer einzugehen."
+    },
+    Vermeiden: {
+        hoch: "Sie vermeiden aktiv Konfrontationen und ziehen sich aus Konflikten zurück. Dies kann kurzfristig Spannungen reduzieren, jedoch auch dazu führen, dass Probleme ungelöst bleiben und sich verstärken.",
+        mittel: "Sie gehen Konflikten vor allem dann aus dem Weg, wenn sie Ihnen unbedeutend erscheinen oder Sie glauben, dass die Situation sich von selbst löst.",
+        niedrig: "Sie stellen sich Auseinandersetzungen offen und scheuen sich nicht, Probleme direkt anzusprechen."
+    },
+    Durchsetzen: {
+        hoch: "Sie setzen sich energisch und durchsetzungsstark für Ihre eigenen Ziele ein – auch gegen Widerstand anderer. Diese Haltung kann effektiv sein, wenn schnelles Handeln oder klare Entscheidungen notwendig sind, birgt aber das Risiko erhöhter Spannung im Team.",
+        mittel: "Sie vertreten Ihre Interessen zielorientiert, sind aber bereit, sie bei Bedarf mit anderen zu verhandeln.",
+        niedrig: "Sie vermeiden Wettbewerbssituationen und versuchen selten, sich auf Kosten anderer durchzusetzen."
+    },
+    Kompromiss: {
+        hoch: "Sie suchen aktiv nach Lösungen, die für alle Seiten akzeptabel sind, auch wenn dies bedeutet, auf Teile Ihrer eigenen Ziele zu verzichten. Diese Haltung kann Konflikte schnell entschärfen, führt aber manchmal zu Kompromissen, die keine optimale Lösung darstellen.",
+        mittel: "Sie sind bereit, einen Mittelweg zu finden, wenn dies die schnellste oder praktischste Lösung verspricht.",
+        niedrig: "Sie sind wenig kompromissbereit und versuchen, entweder Ihre vollständigen Ziele zu erreichen oder andere Lösungswege zu finden."
+    }
+  };
+
+ let html = "<h2>Interpretation</h2><table><tr><th>Konfliktstil</th><th>∅</th><th>Ausprägung</th><th>Erklärung</th></tr>";
+    for (const stil in mittelwerte) {
+        let auspraegung = "mittel";
+        if (mittelwerte[stil] >= 3.66666) auspraegung = "hoch";
+        else if (mittelwerte[stil] < 2.33333) auspraegung = "niedrig";
+        html += `<tr><td>${stil}</td><td>${mittelwerte[stil].toFixed(2)}</td><td>${auspraegung}</td><td>${erklaerung[stil][auspraegung]}</td></tr>`;
+    }
+    html += "</table>";
+
+  const hoechsterStil = Object.keys(mittelwerte).reduce((a,b) => mittelwerte[a] > mittelwerte[b] ? a : b);
+  let auspraegungDom = "mittel";
+  if (mittelwerte[hoechsterStil] >= 3.66666) auspraegungDom = "hoch";
+  else if (mittelwerte[hoechsterStil] < 2.33333) auspraegungDom = "niedrig";
+
+  const stilNamen = { Integrieren: "Integrieren", Nachgeben: "Nachgeben", Vermeiden: "Vermeiden", Durchsetzen: "Durchsetzen", Kompromiss: "Kompromiss" };
+const mittelwertDom = mittelwerte[hoechsterStil].toFixed(2);  
+const infoHTML = `<p><strong>Ihr dominanter Konfliktmanagementstil ist:</strong> ${stilNamen[hoechsterStil]} (∅ = ${mittelwertDom}, Ausprägung = ${auspraegungDom}).
+  <p>${erklaerung[hoechsterStil][auspraegungDom]}<p>`;
+
+  // Ergebnis-Fenster
+const win = window.open("", "Ergebnis", "width=800,height=600");
+
+win.document.write("<html><head><title>Meine Konfliktmanagementstile</title>");
+
+// CSS direkt im Kopf einfügen
+win.document.write("<style>");
+win.document.write(".infoText p { margin-top: 0.2rem; margin-bottom: 0rem; }");
+win.document.write(".infoText p:first-of-type { margin-bottom: 0.3rem; }");
+win.document.write(".infoText p:not(:first-of-type) { margin-bottom: 0rem; }");
+win.document.write("body { font-family: Arial, sans-serif; }");
+win.document.write("h2 { font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem; }");
+win.document.write("h1 { font-size: 1.2rem; margin-top: 0.2rem; margin-bottom: 0rem; color: #333; }");
+win.document.write("#chartFenster { max-width: 180mm; max-height: 80mm; width: 100%; height: auto; }");
+win.document.write("@media print { #chartFenster { width: 180mm !important; height: 100mm !important; } }");
+win.document.write("table { font-size: 0.8rem; border-collapse: collapse; width: 100%; }");
+win.document.write("th, td { padding: 3px; border: 1px solid #ccc; }");
+win.document.write(".infoText { font-size: 0.85rem; line-height: 1.2; margin-top: 1rem; }");
+win.document.write("button { background-color: #ffa500; color: white; border-radius: 9px; }");
+win.document.write(".footerText {");
+win.document.write("background-color: #fde70e;"); // gelbes Kästchen
+win.document.write("border: 5px solid #fde70e;");
+win.document.write("padding: 7px;");
+win.document.write("margin-top: 20px;");
+win.document.write("font-size: 0.85rem;");
+win.document.write("border-radius: 5px;");
+win.document.write("}");
+win.document.write("@media print { .footerText { display: block; margin-top: 20px; font-size: 0.85rem; background-color: #fde70e; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }");
+
+win.document.write("@media screen { .footerText { display: block; } }");
+win.document.write(".blueBox { background-color: #DEEBF7; padding: 10px; margin-top: 20px; margin-bottom: 30px; border-radius: 5px; height: 30px }");
+win.document.write("</style>");
+
+
+win.document.write("</body></html>");
+
+win.document.write("<body>");
+win.document.write("<div class='blueBox'><h1>Meine Konfliktmanagementstile - Ergebnisse</h1></div>");
+win.document.write("<canvas id='chartFenster'></canvas>");
+win.document.write(html);
+win.document.write(`<div class="infoText">${infoHTML}</div>`);
+win.document.write('<p class="footerText">🎓 Quelle Konfliktmanagementstile Bilsky & Wülker, 2000; App-Version Prof. Dr. Albert Vollmer, Hochschule für Angewandte Psychologie FHNW, 2026.<br>❗️Datenschutzhinweis: Die eingegebenen Daten werden nirgends gespeichert und erlöschen beim Schliessen der App.<br></p>');
+win.document.write("<script src='https://cdn.jsdelivr.net/npm/chart.js'><\/script>");
+win.document.write("<script src='https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2'><\/script>");
+
+
+win.document.write(`<script>
+const ctx = document.getElementById('chartFenster').getContext('2d');
+Chart.register(ChartDataLabels);
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Integrieren', 'Nachgeben', 'Vermeiden', 'Durchsetzen', 'Kompromiss'],
+        datasets: [{
+            label: 'Mittelwerte',
+            data: [${integrieren}, ${nachgeben}, ${vermeiden}, ${durchsetzen}, ${kompromiss}],
+            backgroundColor: [
+                'rgba(255,192,0,1)',
+                'rgba(252,168,0,1)',
+                'rgba(180,229,162,1)',
+                'rgba(166,202,236,1)',
+                'rgba(221,183,206,1)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Mittelwerte (∅)',
+                font: { size: 16 },
+                padding: { top: 10, bottom: 10 }
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                formatter: function(value) {
+                    return value.toFixed(2);
+                },
+                font: {
+                    weight: 'bold'
+                }
+            }
+        },
+        scales: {
+            y: {
+                type: 'linear',
+                min: 1,
+                max: 5,
+                beginAtZero: false,
+ticks: { stepSize: 1 }}
+        }
+    }
+});
+
+<\/script>`);
+
+win.document.write("</body></html>");
+}
+</script>
+</body>
+</html>
