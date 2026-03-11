@@ -201,16 +201,16 @@ win.document.write("<style>");
 win.document.write(".infoText p { margin-top: 0.2rem; margin-bottom: 0rem; }");
 win.document.write(".infoText p:first-of-type { margin-bottom: 0.3rem; }");
 win.document.write(".infoText p:not(:first-of-type) { margin-bottom: 0rem; }");
-win.document.write("body { font-family: Arial, sans-serif; }");
+win.document.write("body { font-family: Arial, sans-serif; width: 794px; margin: 0 auto; }");
 win.document.write("h2 { font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem; }");
 win.document.write("h1 { font-size: 1.2rem; margin-top: 0.2rem; margin-bottom: 0rem; color: #333; }");
-win.document.write("#chartFenster { max-width: 180mm; max-height: 80mm; width: 100%; height: auto; }");
-win.document.write("@media print { #chartFenster { width: 180mm !important; height: 100mm !important; } }");
-win.document.write("table { font-size: 0.8rem; border-collapse: collapse; width: 100%; }");
+win.document.write("#chartFenster { display: block; width: 794px !important; height: auto; }");
+win.document.write("@media print { #chartFenster { width: 794px !important; height: 100mm !important; } }");
+win.document.write("table { font-size: 0.8rem; border-collapse: collapse; width: 794px; }");
 win.document.write("th, td { padding: 3px; border: 1px solid #ccc; }");
-win.document.write(".infoText { font-size: 0.85rem; line-height: 1.2; margin-top: 1rem; }");
+win.document.write(".infoText { font-size: 0.85rem; line-height: 1.2; margin-top: 1rem; width: 794px; }");
 win.document.write("button { background-color: #ffa500; color: white; border-radius: 9px; }");
-win.document.write(".footerText {");
+win.document.write(".footerText { width: 794px; background-color: #fde70e; border: 5px solid #fde70e; padding: 7px; margin-top: 20px; font-size: 0.85rem; border-radius: 5px; }");
 win.document.write("background-color: #fde70e;"); // gelbes Kästchen
 win.document.write("border: 5px solid #fde70e;");
 win.document.write("padding: 7px;");
@@ -218,10 +218,10 @@ win.document.write("margin-top: 20px;");
 win.document.write("font-size: 0.85rem;");
 win.document.write("border-radius: 5px;");
 win.document.write("}");
-win.document.write("@media print { .footerText { display: block; margin-top: 20px; font-size: 0.85rem; background-color: #fde70e; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }");
+win.document.write("@media print { .footerText { display: block; margin-top: 20px; font-size: 0.85rem; background-color: #fde70e; -webkit-print-color-adjust: exact; print-color-adjust: exact; width: 794px; } }");
 
 win.document.write("@media screen { .footerText { display: block; } }");
-win.document.write(".blueBox { background-color: #DEEBF7; padding: 10px; margin-top: 20px; margin-bottom: 30px; border-radius: 5px; height: 30px }");
+win.document.write(".blueBox { width: 794px; background-color: #DEEBF7; padding: 10px; margin-top: 20px; margin-bottom: 30px; border-radius: 5px; height: 30px }");
 win.document.write("</style>");
 
 
@@ -229,7 +229,7 @@ win.document.write("</body></html>");
 
 win.document.write("<body>");
 win.document.write("<div class='blueBox'><h1>Meine Konfliktmanagementstile - Ergebnisse</h1></div>");
-win.document.write("<canvas id='chartFenster'></canvas>");
+win.document.write("<canvas id='chartFenster' width='794' height='300'></canvas>");
 win.document.write(html);
 win.document.write(`<div class="infoText">${infoHTML}</div>`);
 win.document.write('<p class="footerText">🎓 Quelle Konfliktmanagementstile Bilsky & Wülker, 2000; App-Version Prof. Dr. Albert Vollmer, Hochschule für Angewandte Psychologie FHNW, 2026.<br>❗️Datenschutzhinweis: Die eingegebenen Daten werden nirgends gespeichert und erlöschen beim Schliessen der App.<br></p>');
@@ -257,7 +257,7 @@ new Chart(ctx, {
         }]
     },
     options: {
-        responsive: true,
+        responsive: false,
         maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
