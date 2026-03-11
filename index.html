@@ -205,7 +205,7 @@ win.document.write("body { font-family: Arial, sans-serif; width: 794px; margin:
 win.document.write("h2 { font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem; }");
 win.document.write("h1 { font-size: 1.2rem; margin-top: 0.2rem; margin-bottom: 0rem; color: #333; }");
 win.document.write("#chartFenster { display: block; width: 794px !important; height: auto; }");
-win.document.write("@media print { #chartFenster { width: 794px !important; height: 100mm !important; } }");
+win.document.write("@media print { #chartFenster { width: 794px !important; height: auto !important; } }");
 win.document.write("table { font-size: 0.8rem; border-collapse: collapse; width: 794px; }");
 win.document.write("th, td { padding: 3px; border: 1px solid #ccc; }");
 win.document.write(".infoText { font-size: 0.85rem; line-height: 1.2; margin-top: 1rem; width: 794px; }");
@@ -258,8 +258,9 @@ new Chart(ctx, {
     },
     options: {
         responsive: false,
-        maintainAspectRatio: false,
-        plugins: {
+        maintainAspectRatio: true,
+aspectRatio: 2.64,         // Breite/Höhe-Verhältnis wie im Ergebnisfenster        
+plugins: {
             legend: { display: false },
             title: {
                 display: true,
