@@ -93,7 +93,30 @@ function showQuestion(index) {
   if (index > 0) {
     introBox.innerHTML = `<span class="intro-title">Meine Konfliktmanagementstile</span>`;
   }
-  const div = document.createElement('div');
+  const progressDiv = document.createElement('div');
+    progressDiv.style.fontWeight = 'bold';
+    progressDiv.style.marginBottom = '10px';
+    progressDiv.textContent = `Frage ${index+1} von ${fragen.length}`;
+    form.appendChild(progressDiv);
+
+ const progressBarContainer = document.createElement('div');
+    progressBarContainer.style.width = '100%';
+    progressBarContainer.style.height = '15px';
+    progressBarContainer.style.backgroundColor = '#eee';
+    progressBarContainer.style.borderRadius = '8px';
+    progressBarContainer.style.marginBottom = '15px';
+
+    const progressBar = document.createElement('div');
+    progressBar.style.height = '100%';
+    progressBar.style.borderRadius = '8px';
+    progressBar.style.backgroundColor = '#ffa500';
+    progressBar.style.width = `${((index+1) / fragen.length) * 100}%`;
+    progressBarContainer.appendChild(progressBar);
+
+    form.appendChild(progressBarContainer);
+
+
+const div = document.createElement('div');
   div.className = 'question';
   div.innerHTML = `<strong>${index+1}. ${fragen[index]}</strong>` +
     [1,2,3,4,5].map(val =>
