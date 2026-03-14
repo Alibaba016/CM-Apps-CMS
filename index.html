@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body { font-family: Arial, sans-serif; margin: 20px; max-width: 900px; }
-.question { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc; }
+.question { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc; border-radius: 5px; }
 label { display: block; margin-bottom: 6px; } /* vertikale Anordnung */
 button { margin-top: 5px; padding: 10px 15px; font-size: 1rem; background-color: #ffa500; color: white; border-radius: 9px }
 canvas { margin-top: 15px; }
@@ -20,8 +20,8 @@ canvas { margin-top: 15px; }
   display: block;      /* eigene Zeile */
   margin-bottom: 0.5rem;
 }
-.intro { background: #DEEBF7; padding: 15px; margin-bottom: 20px; }
-table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+.intro { background: #DEEBF7; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+table { border-collapse: collapse; width: 100%; margin-top: 20px; }fintro
 th, td { border: 1px solid #ccc; padding: 8px; }
 .footerText {
   background-color: #fde70e;
@@ -233,7 +233,7 @@ win.document.write("table { font-size: 0.8rem; border-collapse: collapse; width:
 win.document.write("th, td { padding: 3px; border: 1px solid #ccc; }");
 win.document.write(".infoText { font-size: 0.85rem; line-height: 1.2; margin-top: 1rem; width: 794px; }");
 win.document.write("button { background-color: #ffa500; color: white; border-radius: 9px; }");
-win.document.write(".footerText { width: 794px; background-color: #fde70e; border: 5px solid #fde70e; padding: 7px; margin-top: 20px; font-size: 0.85rem; border-radius: 5px; }");
+win.document.write(".footerText { background-color: #fde70e; border: 5px solid #fde70e; padding: 7px; margin-top: 20px; font-size: 0.85rem; border-radius: 5px; }");
 win.document.write("background-color: #fde70e;"); // gelbes Kästchen
 win.document.write("border: 5px solid #fde70e;");
 win.document.write("padding: 7px;");
@@ -241,10 +241,10 @@ win.document.write("margin-top: 20px;");
 win.document.write("font-size: 0.85rem;");
 win.document.write("border-radius: 5px;");
 win.document.write("}");
-win.document.write("@media print { .footerText { display: block; margin-top: 20px; font-size: 0.85rem; background-color: #fde70e; -webkit-print-color-adjust: exact; print-color-adjust: exact; width: 794px; } }");
+win.document.write("@media print { .footerText { display: block; margin-top: 20px; font-size: 0.85rem; background-color: #fde70e; -webkit-print-color-adjust: exact; print-color-adjust: exact; width: 100% !important; box-sizing: border-box; padding: 7px; border: 5px solid #fde70e; border-darius: 5px; page-break-inside: avoid} }");
 
 win.document.write("@media screen { .footerText { display: block; } }");
-win.document.write(".blueBox { width: 794px; background-color: #DEEBF7; padding: 10px; margin-top: 20px; margin-bottom: 30px; border-radius: 5px; height: 30px }");
+win.document.write(".blueBox { width: 100% !important; box-sizing: border-box; background-color: #DEEBF7; padding: 10px; margin-top: 20px; margin-bottom: 30px; border-radius: 5px; display: flex; }");
 win.document.write("</style>");
 
 
